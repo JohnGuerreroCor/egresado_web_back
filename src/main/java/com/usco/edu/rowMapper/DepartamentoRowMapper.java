@@ -14,6 +14,8 @@ public class DepartamentoRowMapper implements RowMapper<Departamento>{
 		Departamento departamento = new Departamento();
 		departamento.setCodigo(rs.getInt("dep_codigo"));
 		departamento.setNombre(rs.getString("dep_nombre"));
+		departamento.setAcronimo(rs.getString("dep_acronimo"));
+		departamento.setPais(new PaisRowMapper().mapRow(rs, rowNum));
 		return departamento;
 	}
 

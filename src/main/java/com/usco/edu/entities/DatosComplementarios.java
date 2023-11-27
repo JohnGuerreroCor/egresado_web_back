@@ -7,13 +7,15 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Departamento implements Serializable {
+public class DatosComplementarios implements Serializable {
 	
 	private int codigo;
+	private String estudianteCodigo;
 	private String nombre;
-	private String acronimo;
-	private Pais pais;
+	private String apellido;
+	private String programa;
+	private String modalidad;
+	private String perfilProfesional;
 	
 	private static final long serialVersionUID = 1L;
-	
 }

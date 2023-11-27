@@ -54,6 +54,26 @@ public class AppConfig {
 		return jdbcTemplate;
 	}
 	
+	@Bean(name = "JDBCTemplateEjecucion")
+	public JdbcTemplate jdbcTemplateEjecucion() throws Exception {
+
+		DataSource dataSource = null;
+
+		if (perfilSeleccionado.equals("local")) {
+
+			dataSource = (DataSource) new JndiTemplate().lookup("jboss/datasources/academia3000_jankarlos");
+
+		} else if (perfilSeleccionado.equals("test") || perfilSeleccionado.equals("produccion")) {
+
+			dataSource = (DataSource) new JndiTemplate().lookup("java:jboss/datasources/ControlAccesoWebEjecucionDS");
+
+		}
+		JdbcTemplate jdbcTemplate = new JdbcTemplate();
+		jdbcTemplate.setDataSource(dataSource);
+
+		return jdbcTemplate;
+	}
+	
 	@Bean(name = "NamedJDBCTemplateEncuestasConsulta")
 	public NamedParameterJdbcTemplate jdbcTemplateConsulta() throws Exception {
 

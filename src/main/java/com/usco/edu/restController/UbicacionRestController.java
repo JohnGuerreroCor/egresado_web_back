@@ -8,10 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.usco.edu.entities.SedeCarnet;
-import com.usco.edu.entities.SubSede;
-import com.usco.edu.entities.Bloque;
-import com.usco.edu.entities.Oficina;
+import com.usco.edu.entities.Departamento;
+import com.usco.edu.entities.Municipio;
+import com.usco.edu.entities.Pais;
 import com.usco.edu.service.IUbicacionService;
 
 @RestController
@@ -21,53 +20,47 @@ public class UbicacionRestController {
 	@Autowired
 	IUbicacionService ubicacionService;
 	
-	@GetMapping(path = "obtener-sedes/{username}")
-	public List<SedeCarnet> obtenerSedes(@PathVariable String username) {
+	@GetMapping(path = "obtener-paises")
+	public List<Pais> obtenerPaises() {
 		
-		return ubicacionService.obtenerSedes(username);
-		
-	}
-	
-	@GetMapping(path = "obtener-subsedes/{username}")
-	public List<SubSede> obtenSubSedes(@PathVariable String username) {
-		
-		return ubicacionService.obtenerSubSedes(username);
+		return ubicacionService.obtenerPaises();
 		
 	}
 	
-	@GetMapping(path = "obtener-bloques/{username}")
-	public List<Bloque> obteBloques(@PathVariable String username) {
+	@GetMapping(path = "obtener-municipios")
+	public List<Municipio> obtenerMunicipios() {
 		
-		return ubicacionService.obtenerBloques(username);
-		
-	}
-	
-	@GetMapping(path = "obtener-oficinas/{username}")
-	public List<Oficina> obtenerOficinas(@PathVariable String username) {
-		
-		return ubicacionService.obtenerOficinas(username);
+		return ubicacionService.obtenerMunicipios();
 		
 	}
 	
-	@GetMapping(path = "buscar-subsede/{codigo}/{username}")
-	public List<SubSede> buscarSubSedePorSede(@PathVariable int codigo, @PathVariable String username) {
+	@GetMapping(path = "obtener-departamentos-pais/{codigo}")
+	public List<Departamento> obtenerDepartamentosPorPais(@PathVariable int codigo) {
 		
-		return ubicacionService.buscarSubSedePorSede(codigo, username);
-		
-	}
-	
-	@GetMapping(path = "buscar-bloque/{codigo}/{username}")
-	public List<Bloque> buscarBloquePorSubSede(@PathVariable int codigo, @PathVariable String username) {
-		
-		return ubicacionService.buscarBloquePorSubSede(codigo, username);
+		return ubicacionService.obtenerDepartamentosPorPais(codigo);
 		
 	}
 	
-	@GetMapping(path = "buscar-oficina/{codigo}/{username}")
-	public List<Oficina> buscarOficinaPorSede(@PathVariable int codigo, @PathVariable String username) {
+	@GetMapping(path = "obtener-municipios-departamento/{codigo}")
+	public List<Municipio> obtenerMunicipiosPorDepartamento(@PathVariable int codigo) {
 		
-		return ubicacionService.buscarOficinaPorSede(codigo, username);
+		return ubicacionService.obtenerMunicipiosPorDepartamento(codigo);
 		
 	}
+	
+	@GetMapping(path = "obtener-departamentos-municipio/{codigo}")
+	public List<Departamento> obtenerDepartamentosPorMunicipio(@PathVariable int codigo) {
+		
+		return ubicacionService.obtenerDepartamentosPorMunicipio(codigo);
+		
+	}
+	
+	@GetMapping(path = "obtener-paises-departamento/{codigo}")
+	public List<Pais> obtenerPaisesPorDepartamento(@PathVariable int codigo) {
+		
+		return ubicacionService.obtenerPaisesPorDepartamento(codigo);
+		
+	}
+	
 
 }
