@@ -18,10 +18,13 @@ public class RegistroEducativo implements Serializable {
 	private int nivelAcademicoCodigo;
 	private String nivelAcademico;
 	private String institucion;
+	private int paisCodigo;
+	private String pais;
+	private int departamentoCodigo;
+	private String departamento;
 	private int municipioCodigo;
 	private String municipio;
 	private Date fechaFin;
-	private int finalizadoCodigo;
 	private int finalizado;
 	private int estado;
 	

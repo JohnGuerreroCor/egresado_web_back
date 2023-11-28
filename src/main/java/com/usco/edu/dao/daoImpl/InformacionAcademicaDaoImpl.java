@@ -30,17 +30,19 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 	public JdbcTemplate jdbcTemplateEjecucion;
 
 	@Override
-	public List<HabilidadInformatica> obtenerListadoHabilidadesInformaticas(String id) {
+	public List<RegistroEducativo> obtenerListadoRegistroEducativo(String id) {
 		
-		String sql = "select * from graduado.habilidad_informatica hi "
-				+ "inner join persona p on hi.per_codigo = p.per_codigo "
-				+ "inner join graduado.habilidad_informatica_dominio hid on hi.hid_codigo = hid.hid_codigo "
-				+ "where p.per_identificacion = '" + id + "'";
+		String sql = "select * from graduado.registro_educativo re "
+				+ "inner join persona p on re.per_codigo = p.per_codigo "
+				+ "inner join nivel_academico na on re.nia_codigo = na.nia_codigo "
+				+ "inner join municipio m on re.mun_codigo = m.mun_codigo "
+				+ "inner join departamento d on m.dep_codigo = d.dep_codigo "
+				+ "inner join pais pa on d.pai_codigo = pa.pai_codigo "
+				+ "where p.per_identificacion = '" + id + "' and re.ree_estado = 1 order by re.ree_fecha_fin desc";
 		
-		return jdbcTemplate.query(sql, new HabilidadInformaticaSetExtractor());
+		return jdbcTemplate.query(sql, new RegistroEducativoSetExtractor());
 		
 	}
-	
 
 	@Override
 	public List<Idioma> obtenerListadoIdiomas(String id) {
@@ -53,34 +55,34 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 				+ "inner join graduado.idioma_dominio idc on i.idi_conversacion = idc.idd_codigo "
 				+ "inner join graduado.idioma_dominio ide on i.idi_escritura = ide.idd_codigo "
 				+ "inner join graduado.idioma_dominio idl on i.idi_lectura = idl.idd_codigo "
-				+ "where p.per_identificacion = '" + id + "'";
+				+ "where p.per_identificacion = '" + id + "' and i.idi_estado = 1";
 		
 		return jdbcTemplate.query(sql, new IdiomaSetExtractor());
 		
 	}
 	
-
 	@Override
-	public List<RegistroEducativo> obtenerListadoRegistroEducativo(String id) {
+	public List<HabilidadInformatica> obtenerListadoHabilidadesInformaticas(String id) {
 		
-		String sql = "select * from graduado.registro_educativo re "
-				+ "inner join persona p on re.per_codigo = p.per_codigo "
-				+ "inner join nivel_academico na on re.nia_codigo = na.nia_codigo "
-				+ "inner join municipio m on re.mun_codigo = m.mun_codigo "
-				+ "where p.per_identificacion = '" + id + "' order by re.ree_fecha_fin desc";
+		String sql = "select * from graduado.habilidad_informatica hi "
+				+ "inner join persona p on hi.per_codigo = p.per_codigo "
+				+ "inner join graduado.habilidad_informatica_dominio hid on hi.hid_codigo = hid.hid_codigo "
+				+ "where p.per_identificacion = '" + id + "' and hi.hai_estado = 1";
 		
-		return jdbcTemplate.query(sql, new RegistroEducativoSetExtractor());
+		return jdbcTemplate.query(sql, new HabilidadInformaticaSetExtractor());
 		
 	}
 	
-
 	@Override
 	public List<DatosComplementarios> obtenerListadoDatosComplementarios(String id) {
 		
-		String sql = "select top 1 * from graduado.datos_complementarios dc "
+		String sql = "select * from graduado.datos_complementarios dc "
 				+ "inner join estudiante e on dc.est_codigo = e.est_codigo "
 				+ "inner join persona p on e.per_codigo = p.per_codigo "
-				+ "where p.per_identificacion = '" + id + "' order by e.est_codigo desc";
+				+ "inner join programa pr on e.pro_codigo = pr.pro_codigo "
+				+ "inner join uaa u on pr.uaa_codigo = u.uaa_codigo "
+				+ "left join graduado g on dc.est_codigo = g.est_codigo "
+				+ "where dc.est_codigo = '" + id + "'";
 		
 		return jdbcTemplate.query(sql, new DatosComplementariosSetExtractor());
 		
@@ -245,7 +247,7 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 				registroEducativo.getInstitucion(),
 				registroEducativo.getMunicipioCodigo(),
 				registroEducativo.getFechaFin(),
-				registroEducativo.getFinalizadoCodigo()
+				registroEducativo.getFinalizado()
 				});
 		
 		try {
@@ -258,7 +260,7 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 			parameter.addValue("institucion", registroEducativo.getInstitucion());
 			parameter.addValue("municipio", registroEducativo.getMunicipioCodigo());
 			parameter.addValue("fechaFin", registroEducativo.getFechaFin());
-			parameter.addValue("finalizado", registroEducativo.getFinalizadoCodigo());
+			parameter.addValue("finalizado", registroEducativo.getFinalizado());
 			
 			return result;
 
@@ -285,7 +287,7 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 				registroEducativo.getInstitucion(),
 				registroEducativo.getMunicipioCodigo(),
 				registroEducativo.getFechaFin(),
-				registroEducativo.getFinalizadoCodigo(),
+				registroEducativo.getFinalizado(),
 				registroEducativo.getEstado(),
 				registroEducativo.getCodigo()
 				});
@@ -300,7 +302,7 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 			parameter.addValue("institucion", registroEducativo.getInstitucion());
 			parameter.addValue("municipio", registroEducativo.getMunicipioCodigo());
 			parameter.addValue("fechaFin", registroEducativo.getFechaFin());
-			parameter.addValue("finalizado", registroEducativo.getFinalizadoCodigo());
+			parameter.addValue("finalizado", registroEducativo.getFinalizado());
 			parameter.addValue("estado", registroEducativo.getEstado());
 			parameter.addValue("codigo", registroEducativo.getCodigo());
 			
@@ -378,6 +380,32 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 			return 0;
 		}
 		
+	}
+
+	@Override
+	public int actualizarRegistroEgresado(DatosComplementarios datosComplementarios) {
+		
+		String sql = "UPDATE dbo.estudiante "
+				+ "SET est_registro_egresado=1 "
+				+ "WHERE est_codigo = ?;";
+
+		int result = jdbcTemplateEjecucion.update(sql, new Object[] {
+				datosComplementarios.getEstudianteCodigo(),
+				});
+		
+		try {
+
+			MapSqlParameterSource parameter = new MapSqlParameterSource();
+			
+			parameter.addValue("estudianteCodigo", datosComplementarios.getEstudianteCodigo());
+			
+			return result;
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
 }

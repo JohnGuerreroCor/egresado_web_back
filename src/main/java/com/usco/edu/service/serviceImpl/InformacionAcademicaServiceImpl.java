@@ -101,5 +101,12 @@ public class InformacionAcademicaServiceImpl implements IInformacionAcademicaSer
 		return informacionAcademicaDao.actualizarDatosComplementarios(datosComplementarios);
 		
 	}
+
+	@Override
+	public int actualizarRegistroEgresado(DatosComplementarios datosComplementarios) {
+		
+		return informacionAcademicaDao.actualizarRegistroEgresado(datosComplementarios);
+		
+	}
 	
 }

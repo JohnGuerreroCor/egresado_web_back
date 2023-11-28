@@ -106,5 +106,12 @@ public class InformacionAcademicaRestController {
 		return informacionAcademicaService.actualizarDatosComplementarios(datosComplementarios);
 		
 	}
+	
+	@PutMapping(path = "actualizar-registro-egresado")
+	public int actualizarRegistroEgresado(@RequestBody DatosComplementarios datosComplementarios) {
+		
+		return informacionAcademicaService.actualizarRegistroEgresado(datosComplementarios);
+		
+	}
 
 }

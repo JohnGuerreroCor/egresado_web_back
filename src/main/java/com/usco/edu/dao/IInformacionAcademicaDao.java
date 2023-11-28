@@ -32,5 +32,7 @@ public interface IInformacionAcademicaDao {
 	public int registrarDatosComplementarios(DatosComplementarios datosComplementarios);
 	
 	public int actualizarDatosComplementarios(DatosComplementarios datosComplementarios);
+	
+	public int actualizarRegistroEgresado(DatosComplementarios datosComplementarios);
 
 }

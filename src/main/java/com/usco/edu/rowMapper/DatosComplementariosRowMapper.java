@@ -16,6 +16,8 @@ public class DatosComplementariosRowMapper implements RowMapper<DatosComplementa
 		datosComplementarios.setEstudianteCodigo(rs.getString("est_codigo"));
 		datosComplementarios.setModalidad(rs.getString("dac_modalidad_grado"));
 		datosComplementarios.setPerfilProfesional(rs.getString("dac_perfil_profesional"));
+		datosComplementarios.setPrograma(rs.getString("uaa_nombre"));
+		datosComplementarios.setFechaGrado(rs.getDate("gra_fecha"));
 		return datosComplementarios;
 	}
 }

@@ -1,6 +1,7 @@
 package com.usco.edu.entities;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class DatosComplementarios implements Serializable {
 	private String programa;
 	private String modalidad;
 	private String perfilProfesional;
+	private Date fechaGrado;
 	
 	private static final long serialVersionUID = 1L;
 }

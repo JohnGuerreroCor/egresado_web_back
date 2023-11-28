@@ -19,6 +19,10 @@ public class RegistroEducativoRowMapper implements RowMapper<RegistroEducativo> 
 		registroEducativo.setNivelAcademico(rs.getString("nia_nombre"));
 		registroEducativo.setMunicipioCodigo(rs.getInt("mun_codigo"));
 		registroEducativo.setMunicipio(rs.getString("mun_nombre"));
+		registroEducativo.setPaisCodigo(rs.getInt("pai_codigo"));
+		registroEducativo.setPais(rs.getString("pai_nombre"));
+		registroEducativo.setDepartamentoCodigo(rs.getInt("dep_codigo"));
+		registroEducativo.setDepartamento(rs.getString("dep_nombre"));
 		registroEducativo.setInstitucion(rs.getString("ree_institucion"));
 		registroEducativo.setFechaFin(rs.getDate("ree_fecha_fin"));
 		registroEducativo.setFinalizado(rs.getInt("ree_finalizado"));
