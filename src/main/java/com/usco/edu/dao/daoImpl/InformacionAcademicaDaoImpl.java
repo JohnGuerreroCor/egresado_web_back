@@ -321,7 +321,7 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 	public int registrarDatosComplementarios(DatosComplementarios datosComplementarios) {
 		
 		String sql = "INSERT INTO graduado.datos_complementarios "
-				+ "(est_codigo, dac_modalidad_grado, dac_perfil_profesional) "
+				+ "(est_codigo, dac_trabajo_grado, dac_perfil_profesional) "
 				+ "VALUES(?, ?, ?);";
 
 		int result = jdbcTemplateEjecucion.update(sql, new Object[] {
@@ -353,7 +353,7 @@ public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 	public int actualizarDatosComplementarios(DatosComplementarios datosComplementarios) {
 		
 		String sql = "UPDATE graduado.datos_complementarios "
-				+ "SET est_codigo=?, dac_modalidad_grado=?, dac_perfil_profesional=? "
+				+ "SET est_codigo=?, dac_trabajo_grado=?, dac_perfil_profesional=? "
 				+ "WHERE dac_codigo=?;";
 
 		int result = jdbcTemplateEjecucion.update(sql, new Object[] {
