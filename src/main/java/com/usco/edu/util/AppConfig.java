@@ -45,7 +45,7 @@ public class AppConfig {
 
 		} else if (perfilSeleccionado.equals("test") || perfilSeleccionado.equals("produccion")) {
 
-			dataSource = (DataSource) new JndiTemplate().lookup("java:jboss/datasources/CarnetizacionWebLoginDS");
+			dataSource = (DataSource) new JndiTemplate().lookup("java:jboss/datasources/EgresadoWebLoginDS");
 
 		}
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
@@ -65,7 +65,7 @@ public class AppConfig {
 
 		} else if (perfilSeleccionado.equals("test") || perfilSeleccionado.equals("produccion")) {
 
-			dataSource = (DataSource) new JndiTemplate().lookup("java:jboss/datasources/ControlAccesoWebEjecucionDS");
+			dataSource = (DataSource) new JndiTemplate().lookup("java:jboss/datasources/EgresadoWebEjecucionDS");
 
 		}
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
