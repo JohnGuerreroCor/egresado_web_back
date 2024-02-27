@@ -13,7 +13,7 @@ import com.usco.edu.rowMapper.UsuarioRowMapper;
 public class UsuarioDaoImpl implements IUsuarioDao{
 	
 	@Autowired
-	@Qualifier("JDBCTemplatePlanesLogin")
+	@Qualifier("JDBCTemplateLogin")
 	public JdbcTemplate jdbcTemplate;
 
 	@Override

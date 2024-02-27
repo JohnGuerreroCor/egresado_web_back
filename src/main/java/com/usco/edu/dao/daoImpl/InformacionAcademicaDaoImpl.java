@@ -22,7 +22,7 @@ import com.usco.edu.resultSetExtractor.RegistroEducativoSetExtractor;
 public class InformacionAcademicaDaoImpl implements IInformacionAcademicaDao {
 	
 	@Autowired
-	@Qualifier("JDBCTemplatePlanesConsulta")
+	@Qualifier("JDBCTemplateConsulta")
 	public JdbcTemplate jdbcTemplate;
 	
 	@Autowired

@@ -16,7 +16,7 @@ import com.usco.edu.resultSetExtractor.HistorialLaboralSetExtractor;
 public class HistorialLaboralDaoImpl implements IHistorialLaboralDao {
 	
 	@Autowired
-	@Qualifier("JDBCTemplatePlanesConsulta")
+	@Qualifier("JDBCTemplateConsulta")
 	public JdbcTemplate jdbcTemplate;
 	
 	@Autowired

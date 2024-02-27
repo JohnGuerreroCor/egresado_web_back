@@ -10,11 +10,11 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>usco.edu.co</groupId>
-	<artifactId>carnet-usuario</artifactId>
+	<artifactId>egresados-web</artifactId>
 	<version>1.0</version>
 	<packaging>war</packaging>
-	<name>carnet-usuario</name>
-	<description>Sistema que permite al usuario visualizar su carnet digital</description>
+	<name>egresados-web</name>
+	<description>Sistema egresados de la web</description>
 
 	<properties>
 		<java.version>1.8</java.version>

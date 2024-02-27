@@ -32,7 +32,7 @@ public class DatosPersonalesDaoImpl implements IDatosPersonalesDao {
 	private AuditoriaJdbcTemplate jdbcComponent;
 	
 	@Autowired
-	@Qualifier("JDBCTemplatePlanesConsulta")
+	@Qualifier("JDBCTemplateConsulta")
 	public JdbcTemplate jdbcTemplate;
 	
 	@Autowired
