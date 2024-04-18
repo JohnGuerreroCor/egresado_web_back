@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>usco.edu.co</groupId>
-	<artifactId>egresados-web</artifactId>
+	<artifactId>egresado_web</artifactId>
 	<version>1.0</version>
 	<packaging>war</packaging>
-	<name>egresados-web</name>
+	<name>egresado_web</name>
 	<description>Sistema egresados de la web</description>
 
 	<properties>

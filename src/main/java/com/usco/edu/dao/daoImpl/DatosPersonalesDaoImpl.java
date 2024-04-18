@@ -1,35 +1,25 @@
 package com.usco.edu.dao.daoImpl;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.usco.edu.dao.IDatosPersonalesDao;
 import com.usco.edu.entities.DatosPersonales;
 import com.usco.edu.entities.EstadoCivil;
 import com.usco.edu.entities.GrupoSanguineo;
-import com.usco.edu.entities.SoporteExpedicion;
 import com.usco.edu.entities.TipoDocumento;
 import com.usco.edu.resultSetExtractor.DatosPersonalesSetExtractor;
 import com.usco.edu.resultSetExtractor.EstadoCivilSetExtractor;
 import com.usco.edu.resultSetExtractor.GrupoSanguineoSetExtractor;
 import com.usco.edu.resultSetExtractor.TipoDocumentoSetExtractor;
-import com.usco.edu.util.AuditoriaJdbcTemplate;
 
 @Repository
 public class DatosPersonalesDaoImpl implements IDatosPersonalesDao {
-	
-	@Autowired
-	private AuditoriaJdbcTemplate jdbcComponent;
 	
 	@Autowired
 	@Qualifier("JDBCTemplateConsulta")
@@ -40,7 +30,7 @@ public class DatosPersonalesDaoImpl implements IDatosPersonalesDao {
 	public JdbcTemplate jdbcTemplateEjecucion;
 
 	@Override
-	public List<DatosPersonales> obtenerDatosPersonales(int id) {
+	public List<DatosPersonales> obtenerDatosPersonales(String identificacion) {
 		
 		String sql = "select top 1 p.per_codigo, p.tii_codigo, ti.tii_nombre, p.per_identificacion, p.per_apellido, p.per_nombre, "
 				+ "p.per_genero, p.per_estado_civil, ec.esc_nombre, p.grs_codigo, gs.grs_nombre, p.per_fecha_nacimiento, "
@@ -63,7 +53,7 @@ public class DatosPersonalesDaoImpl implements IDatosPersonalesDao {
 				+ "left join pais p2 on d2.pai_codigo = p2.pai_codigo "
 				+ "left join pais p3 on d3.pai_codigo = p3.pai_codigo "
 				+ "left join graduado.soporte_fecha_expedicion sfe on p.per_codigo = sfe.per_codigo "
-				+ "where p.per_identificacion = '" + id +  "' order by sfe.sfe_codigo desc";
+				+ "where p.per_identificacion = '" + identificacion +  "' order by sfe.sfe_codigo desc";
 		return jdbcTemplate.query(sql, new DatosPersonalesSetExtractor());
 		
 	}
@@ -161,120 +151,6 @@ public class DatosPersonalesDaoImpl implements IDatosPersonalesDao {
 
 			e.printStackTrace();
 			return 0;
-		}
-		
-	}
-	
-	@Override
-	public int actualizarDatosExpedicion(String userdb, DatosPersonales expedicion) {
-		
-		DataSource dataSource = jdbcComponent.construirDataSourceDeUsuario(userdb);
-		NamedParameterJdbcTemplate jdbc = jdbcComponent.construirTemplatenew(dataSource);
-
-		String sql = "UPDATE dbo.persona "
-				+ "SET per_lugar_expedicion=:municipio, per_fecha_expedicion=:fechaExpedicion "
-				+ "WHERE per_codigo=:codigo;";
-
-		try {
-
-			MapSqlParameterSource parameter = new MapSqlParameterSource();
-			
-			parameter.addValue("codigo", expedicion.getCodigo());
-			parameter.addValue("municipio", expedicion.getMunicipioExpedicionCodigo());
-			parameter.addValue("fechaExpedicion", expedicion.getIdentificacionFechaExpedicion());
-
-			return jdbc.update(sql, parameter);
-		} catch (Exception e) {
-
-			e.printStackTrace();
-			return 0;
-		} finally {
-			try {
-				cerrarConexion(dataSource.getConnection());
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	@Override
-	public void registrarSoporteExpedicion(String userdb, SoporteExpedicion soporte) {
-		
-		DataSource dataSource = jdbcComponent.construirDataSourceDeUsuario(userdb);
-		NamedParameterJdbcTemplate jdbc = jdbcComponent.construirTemplatenew(dataSource);
-
-		String sql = "INSERT INTO graduado.soporte_fecha_expedicion "
-				+ "(per_codigo, sfe_nombre, sfe_ruta_archivo) "
-				+ "VALUES(:perCodigo, :nombre, :url);";
-		try {
-
-			MapSqlParameterSource parameter = new MapSqlParameterSource();
-			
-			parameter.addValue("perCodigo", soporte.getPerCodigo());
-			parameter.addValue("nombre", soporte.getNombre());
-			parameter.addValue("url", soporte.getRuta());
-
-			jdbc.update(sql, parameter);
-			System.out.println("PASA POR CREATE");
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-		} finally {
-			try {
-				cerrarConexion(dataSource.getConnection());
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-	}
-
-	@Override
-	public void actualizarSoporteExpedicion(String userdb, SoporteExpedicion soporte) {
-		
-		DataSource dataSource = jdbcComponent.construirDataSourceDeUsuario(userdb);
-		NamedParameterJdbcTemplate jdbc = jdbcComponent.construirTemplatenew(dataSource);
-
-		String sql = "UPDATE graduado.soporte_fecha_expedicion "
-				+ "SET sfe_nombre=:nombre, sfe_ruta_archivo=:url"
-				+ "WHERE sfe_codigo =:codigo;";
-
-		try {
-
-			MapSqlParameterSource parameter = new MapSqlParameterSource();
-			
-			parameter.addValue("codigo", soporte.getCodigo());
-			parameter.addValue("nombre", soporte.getNombre());
-			parameter.addValue("url", soporte.getRuta());
-
-			jdbc.update(sql, parameter);
-			System.out.println("PASA POR ACTULIZAR");
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		} finally {
-			try {
-				cerrarConexion(dataSource.getConnection());
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private void cerrarConexion(Connection con) {
-		if (con == null)
-			return;
-
-		try {
-			con.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 	}
