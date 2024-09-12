@@ -28,132 +28,158 @@ import com.usco.edu.service.IUsuarioService;
 
 @RestController
 public class TokenRestController {
-	
+
 	@Autowired
 	IInicioSesionService inicioSesionService;
-	
-	@Autowired 
+
+	@Autowired
 	IUsuarioService usuarioservice;
-	
+
+	// ENDPOINT PARA OBTENER EL TOKEN
 	@GetMapping("/getToken/{username}")
-	public ResponseEntity<?>  getToken(@PathVariable("username") String username ,HttpServletRequest request) {
+	public ResponseEntity<?> getToken(@PathVariable("username") String username, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
-		Usuario usuario = usuarioservice.findByUsername(username);
+
+		// OBTENER INFORMACIÓN DEL USUARIO
+		Usuario usuario = usuarioservice.buscarUsuario(username);
 		String ip = request.getRemoteAddr().toString();
-		String respuesta = generartoken(usuario,ip);
-		
-		System.out.println("token :"+respuesta);
+
+		// GENERAR EL TOKEN DE SESIÓN
+		String respuesta = generartoken(usuario, ip);
+
+		System.out.println("Token generado: " + respuesta);
 		response.put("correo", respuesta);
-		return new ResponseEntity<Map<String, Object>>(response,  HttpStatus.OK);
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
-	
+
+	// ENDPOINT PARA VALIDAR EL TOKEN
 	@GetMapping("/validarToken/{username}/{codigo}")
-	public ResponseEntity<?> validarToken(@PathVariable("username") String username ,@PathVariable("codigo") String codigo ,HttpServletRequest request) {
+	public ResponseEntity<?> validarToken(@PathVariable("username") String username,
+			@PathVariable("codigo") String codigo, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
-		Usuario usuario = usuarioservice.findByUsername(username);
+
+		// OBTENER INFORMACIÓN DEL USUARIO
+		Usuario usuario = usuarioservice.buscarUsuario(username);
 		String ip = request.getRemoteAddr().toString();
+
+		// VALIDAR EL CÓDIGO DE VERIFICACIÓN
 		boolean respuesta = validarToken(usuario, ip, codigo);
-		System.out.println("Entramos validar token");
-		
-		if(respuesta) {
+		System.out.println("Entramos a validar el token");
+
+		if (respuesta) {
 			response.put("mensaje", "Código de verificación correcto");
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-		}else {
-			response.put("mensaje", "Código de verificación  incorrecto.");
+		} else {
+			response.put("mensaje", "Código de verificación incorrecto.");
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
-		
-
 	}
-	
-	private String generartoken(Usuario usuarioLogueado , String ip ) {
-		String aplicativo = "80";
-		System.out.println(aplicativo+""+usuarioLogueado.getId() + ip);
-		String tokenSesion = inicioSesionService.obtenerTokenInicioSesion(aplicativo+""+usuarioLogueado.getId() + ip , usuarioLogueado.getUsername());		
-		String url  = inicioSesionService.urlTokenPeticion(usuarioLogueado.getUsername()) + "api/generarCodigo";
-		System.out.println(url);
+
+	// MÉTODO PARA GENERAR EL TOKEN DE SESIÓN
+	private String generartoken(Usuario usuarioLogueado, String ip) {
+		String aplicativo = "80"; //IMPORTANTE REEMPLAZAR ESTE CÓDIGO CON EL MÓDULO CORRESPONDIENTE, BUSCAR EN LA TABLA MODULO DE LA BASE DE DATOS
+		System.out.println("Datos para el token: " + aplicativo + usuarioLogueado.getId() + ip);
+
+		// OBTENER EL TOKEN DE SESIÓN DESDE EL SERVICIO
+		String tokenSesion = inicioSesionService
+				.obtenerTokenInicioSesion(aplicativo + usuarioLogueado.getId() + ip, usuarioLogueado.getUsername());
+
+		// CONSTRUIR LA URL PARA GENERAR EL CÓDIGO
+		String url = inicioSesionService.urlTokenPeticion(usuarioLogueado.getUsername()) + "api/generarCodigo";
+		System.out.println("URL para generar código: " + url);
+
+		// CODIFICAR EL TOKEN DE SESIÓN EN BASE64
 		String tokenSesionbase64 = Base64.getEncoder().encodeToString(tokenSesion.getBytes());
-		
+
+		// Configurar las cabeceras para la solicitud HTTP
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", tokenSesionbase64);
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED); 
-		
-		
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		// CODIFICAR DATOS ADICIONALES EN BASE64
 		String aplicativobase64 = Base64.getEncoder().encodeToString(aplicativo.getBytes());
-		String usuariobase64 = Base64.getEncoder().encodeToString((""+usuarioLogueado.getId()).getBytes() );
-		String ipbase64  = Base64.getEncoder().encodeToString((ip).getBytes());
-		
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();		
+		String usuariobase64 = Base64.getEncoder().encodeToString(String.valueOf(usuarioLogueado.getId()).getBytes());
+		String ipbase64 = Base64.getEncoder().encodeToString(ip.getBytes());
+
+		// CONSTRUIR EL CUERPO DE LA SOLICITUD HTTP
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.add("aplicativo", aplicativobase64);
 		map.add("usuario", usuariobase64);
 		map.add("ip", ipbase64);
-		
-		final HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map ,
-		        headers);
+
+		final HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map,
+				headers);
 		String respuesta = null;
+
 		try {
-		    RestTemplate restTemplate = new RestTemplate();
-		    ResponseEntity<RespuestaToken> responseEntity = restTemplate.exchange(
-		            url, HttpMethod.POST, entity,RespuestaToken.class);
-		    
-		    if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-		        try {
-		        	respuesta = responseEntity.getBody().getMensaje();
-		        } catch (Exception e) {
-		            throw new RuntimeException("JSONException occurred");
-		        }
-		    }
+			// REALIZAR LA SOLICITUD HTTP PARA GENERAR EL CÓDIGO
+			RestTemplate restTemplate = new RestTemplate();
+			ResponseEntity<RespuestaToken> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
+					RespuestaToken.class);
+
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				// OBTENER LA RESPUESTA DEL SERVICIO
+				respuesta = responseEntity.getBody().getMensaje();
+			}
 		} catch (Exception exception) {
-			 throw new RuntimeException(exception);
-	    } 
-		System.out.println("mensaje1: "+respuesta);
+			throw new RuntimeException(exception);
+		}
+
+		System.out.println("Mensaje del servicio: " + respuesta);
 		return respuesta;
 	}
-	
-	private boolean validarToken(Usuario usuarioLogueado , String ip , String CodigoVerificacion ) {
-		String aplicativo = "80";
-		String tokenSesion = inicioSesionService.obtenerTokenInicioSesion(aplicativo+""+usuarioLogueado.getId() + ip , usuarioLogueado.getUsername());	
-		String url  = inicioSesionService.urlTokenPeticion(usuarioLogueado.getUsername()) + "api/validarCodigo";
+
+	// MÉTODO PARA VALIDAR EL CÓDIGO DE VERIFICACIÓN
+	private boolean validarToken(Usuario usuarioLogueado, String ip, String CodigoVerificacion) {
+		String aplicativo = "80"; //IMPORTANTE REEMPLAZAR ESTE CÓDIGO CON EL MÓDULO CORRESPONDIENTE, BUSCAR EN LA TABLA MODULO DE LA BASE DE DATOS
+
+		// OBTENER EL TOKEN DE SESIÓN DESDE EL SERVICIO
+		String tokenSesion = inicioSesionService
+				.obtenerTokenInicioSesion(aplicativo + usuarioLogueado.getId() + ip, usuarioLogueado.getUsername());
+
+		// CONSTRUIR LA URL PARA VALIDAR EL CÓDIGO
+		String url = inicioSesionService.urlTokenPeticion(usuarioLogueado.getUsername()) + "api/validarCodigo";
 		String tokenSesionbase64 = Base64.getEncoder().encodeToString(tokenSesion.getBytes());
-		
+
+		// CONFIGURAR LAS CABECERAS PARA LA SOLICITUD HTTP
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", tokenSesionbase64);
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED); 
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		String aplicativobase64 = Base64.getEncoder().encodeToString((aplicativo).getBytes());
-		String usuariobase64 = Base64.getEncoder().encodeToString((""+usuarioLogueado.getId()).getBytes() );
-		String ipbase64  = Base64.getEncoder().encodeToString((ip).getBytes());
-		String CodigoVerificacionbase64 = Base64.getEncoder().encodeToString((CodigoVerificacion).getBytes());
-		
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();		
+		// CODIFICAR DATOS ADICIONALES EN BASE64
+		String aplicativobase64 = Base64.getEncoder().encodeToString(aplicativo.getBytes());
+		String usuariobase64 = Base64.getEncoder().encodeToString(String.valueOf(usuarioLogueado.getId()).getBytes());
+		String ipbase64 = Base64.getEncoder().encodeToString(ip.getBytes());
+		String CodigoVerificacionbase64 = Base64.getEncoder().encodeToString(CodigoVerificacion.getBytes());
+
+		// CONSTRUIR EL CUERPO DE LA SOLICITUD HTTP
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.add("aplicativo", aplicativobase64);
 		map.add("usuario", usuariobase64);
 		map.add("ip", ipbase64);
 		map.add("codigoVerificacion", CodigoVerificacionbase64);
-		
-		
-		final HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map ,
-		        headers);
+
+		final HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map,
+				headers);
 		Boolean respuesta = false;
+
 		try {
-		    RestTemplate restTemplate = new RestTemplate();
-		    ResponseEntity<RespuestaToken> responseEntity = restTemplate.exchange(
-		            url, HttpMethod.POST, entity,RespuestaToken.class);
-		    if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-		        try {
-		        	respuesta = responseEntity.getBody().isEstado();
-		        	System.out.println("repsuesta al validar a: "+responseEntity.getBody().getMensaje());
-		        	System.out.println("repsuesta al validar 0 : "+respuesta);
-		        } catch (Exception e) {
-		            throw new RuntimeException("JSONException occurred");
-		        }
-		    }
-		}catch (Exception exception) {
-				 throw new RuntimeException(exception);
-		    } 
-		
-		System.out.println("repsuesta al validar : "+respuesta);
+			// REALIZAR LA SOLICITUD HTTP PARA VALIDAR EL CÓDIGO
+			RestTemplate restTemplate = new RestTemplate();
+			ResponseEntity<RespuestaToken> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
+					RespuestaToken.class);
+
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				// OBTENER LA RESPUESTA DEL SERVICIO
+				respuesta = responseEntity.getBody().isEstado();
+				System.out.println("Respuesta al validar: " + responseEntity.getBody().getMensaje());
+				System.out.println("Respuesta al validar: " + respuesta);
+			}
+		} catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
+
+		System.out.println("Respuesta al validar: " + respuesta);
 		return respuesta;
 	}
-
 }

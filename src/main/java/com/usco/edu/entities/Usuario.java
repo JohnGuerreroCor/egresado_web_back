@@ -14,7 +14,6 @@ public class Usuario implements Serializable {
     private String password;
     private String userdb;
     private boolean state;
-    private Uaa uaa;
     private Persona persona;
     private String role;
     private String horaInicioSesion;
