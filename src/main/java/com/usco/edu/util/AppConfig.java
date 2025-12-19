@@ -29,7 +29,7 @@ public class AppConfig {
 	public JdbcTemplate jdbcTemplateConsultasjdbc() throws Exception {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
 		jdbcTemplate.setDataSource(dataSource);
-
+	
 		return jdbcTemplate;
 	}
 	

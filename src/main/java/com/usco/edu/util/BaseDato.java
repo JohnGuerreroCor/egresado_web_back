@@ -9,12 +9,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
+import javax.naming.InitialContext;	
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 
 public class BaseDato {
+	
+	@Value("${spring.profiles.active}")
+	private String perfilSeleccionado;
 
 	Logger log = Logger.getLogger(getClass().getName());
 
@@ -24,10 +28,16 @@ public class BaseDato {
 			Context ctx = new InitialContext();
 
 			DataSource dataSource = null;
+			
+			if (perfilSeleccionado.equals("local")) {
 
-//			dataSource = (DataSource) ctx.lookup("jboss/datasources/ConsultaDS");
+				dataSource = (DataSource) ctx.lookup("jboss/datasources/ConsultaDS");
 
-			dataSource = (DataSource) ctx.lookup("java:jboss/datasources/EgresadoWebConsultaDS");
+			} else if (perfilSeleccionado.equals("test") || perfilSeleccionado.equals("produccion")) {
+
+				dataSource = (DataSource) ctx.lookup("java:jboss/datasources/EgresadoWebConsultaDS");
+
+			}
 
 			conexion = dataSource.getConnection();
 			
